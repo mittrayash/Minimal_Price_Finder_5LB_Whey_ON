@@ -22,7 +22,7 @@ for container in containers:
     print(container['title'][15:], '\t', container['data-dp-url'])
     if not container['data-dp-url']:
         price = page_soup.find("span", {"id": "priceblock_ourprice"})
-        dictionary[str(container['title'][15:])] = float(price.text)
+        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
 
     # now go to the link to fetch the price and store in the dictionary
     else:
@@ -31,8 +31,8 @@ for container in containers:
         uCl.close()
         soup = Soup(html, "html.parser")
         price = soup.find("span", {"id": "priceblock_ourprice"})
-        dictionary[str(container['title'][15:])] = float(price.text)
+        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
 
-# sorted_x = sorted(dictionary.items(), key=operator.itemgetter(1))
-# print(sorted_x)
+sorted_x = sorted(dictionary.items(), key=operator.itemgetter(1))
+print(sorted_x)
 
