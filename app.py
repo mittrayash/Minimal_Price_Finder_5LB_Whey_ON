@@ -1,16 +1,76 @@
-# -*- coding: utf-8 -*-
+__author__ = 'mittr'
 
-# Form implementation generated from reading ui file 'C:\Users\mittr\Desktop\untitled.ui'
-#
-# Created by: PyQt5 UI code generator 5.6
-#
-# WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from urllib.request import urlopen as ureq
+from PyQt5.QtWidgets import QTableWidgetItem
+from bs4 import BeautifulSoup as Soup
+import re
+import operator
+import urllib.request as urllib2
+
 
 class Ui_MainWindow(object):
+
+
+    def whey(self):
+        # Let's fetch the soup for the page here!
+        my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000QSNYGI/ref=sr_1_6?s=hpc&ie=UTF8&qid=1516012071&sr=1-6&keywords=whey+protein'
+
+        uClient = ureq(my_url)
+        page_html = uClient.read()
+        uClient.close()
+        page_soup = Soup(page_html, "html.parser")
+
+        # A little bit of Regex here to fetch the list items with id's beginning with flavor_name_
+        containers = page_soup.findAll("li", {"id": re.compile("^flavor_name_")})
+        total = len(containers)
+        while True:
+            try:
+                # The solution set :)
+                dictionary = {}
+                i = 0
+                for container in containers:
+                    print(container['title'][15:], '\t', container['data-dp-url'])
+                    if not container['data-dp-url']:
+                        price = page_soup.find("span", {"id": "priceblock_ourprice"})
+                        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
+
+                    # now go to the link to fetch the price and store in the dictionary
+                    else:
+                        uCl = ureq('https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder' + container['data-dp-url'])
+                        html = uCl.read()
+                        uCl.close()
+                        soup = Soup(html, "html.parser")
+                        price = soup.find("span", {"id": "priceblock_ourprice"})
+                        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
+                    i += 1
+                    completed = (i/total)*100
+                    self.progressBar.setValue(completed)
+            except urllib2.HTTPError as err:
+                print("RESTARTING - NETWORK ERROR")
+                pass
+            else:
+                break
+        print("Flavors in non-descending order of price: \n")
+
+        # Sorting the dictionary items in non decreasing order!
+        sorted_x = sorted(dictionary.items(), key=operator.itemgetter(1))
+        print(sorted_x)
+        print(len(sorted_x))
+        i = 0
+
+        for flavor, price in sorted_x:
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(flavor))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(str(price)))
+            print("{:<25} {:<7}".format(flavor, price))
+            i += 1
+
+    def handler(self):
+        self.start.clicked.connect(self.whey)
+
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
+        MainWindow.setObjectName("Optimum Nutrition Minimum Price Finder @ Amazon India")
         MainWindow.resize(600, 400)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 700))
@@ -42,7 +102,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setGeometry(QtCore.QRect(10, 20, 271, 301))
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(2)
-        self.tableWidget.setRowCount(0)
+        self.tableWidget.setRowCount(17)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -52,7 +112,7 @@ class Ui_MainWindow(object):
         self.label.setObjectName("label")
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.progressBar.setGeometry(QtCore.QRect(30, 300, 241, 23))
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
         self.groupBox1.raise_()
         self.groupBox.raise_()
@@ -73,6 +133,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        # Define custom handler
+        self.handler()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

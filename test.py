@@ -1,31 +1,58 @@
-__author__ = 'mittr'
-
 import sys
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget
-from PyQt5.QtCore import QSize
-
-class HelloWindow(QMainWindow):
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
+ 
+class App(QWidget):
+ 
     def __init__(self):
-        QMainWindow.__init__(self)
-
-        self.setMinimumSize(QSize(640, 480))
-        self.setGeometry(300, 200, 1000, 500)
-        self.setWindowTitle("Hello world")
-
-        centralWidget = QWidget(self)
-        self.setCentralWidget(centralWidget)
-
-        gridLayout = QGridLayout(self)
-        centralWidget.setLayout(gridLayout)
-
-        title = QLabel("Hello World from PyQt", self)
-        title.setAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(title, 0, 0)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = HelloWindow()
-    mainWin.show()
-    sys.exit( app.exec_() )
+        super().__init__()
+        self.title = 'PyQt5 table - pythonspot.com'
+        self.left = 0
+        self.top = 0
+        self.width = 300
+        self.height = 200
+        self.initUI()
+ 
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+ 
+        self.createTable()
+ 
+        # Add box layout, add table to box layout and add box layout to widget
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.tableWidget) 
+        self.setLayout(self.layout) 
+ 
+        # Show widget
+        self.show()
+ 
+    def createTable(self):
+       # Create table
+        self.tableWidget = QTableWidget()
+        self.tableWidget.setRowCount(4)
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setItem(0,0, QTableWidgetItem("Cell (1,1)"))
+        self.tableWidget.setItem(0,1, QTableWidgetItem("Cell (1,2)"))
+        self.tableWidget.setItem(1,0, QTableWidgetItem("Cell (2,1)"))
+        self.tableWidget.setItem(1,1, QTableWidgetItem("Cell (2,2)"))
+        self.tableWidget.setItem(2,0, QTableWidgetItem("Cell (3,1)"))
+        self.tableWidget.setItem(2,1, QTableWidgetItem("Cell (3,2)"))
+        self.tableWidget.setItem(3,0, QTableWidgetItem("Cell (4,1)"))
+        self.tableWidget.setItem(3,1, QTableWidgetItem("Cell (4,2)"))
+        self.tableWidget.move(0,0)
+ 
+        # table selection change
+        self.tableWidget.doubleClicked.connect(self.on_click)
+ 
+    @pyqtSlot()
+    def on_click(self):
+        print("\n")
+        for currentQTableWidgetItem in self.tableWidget.selectedItems():
+            print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
+ 
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
