@@ -1,6 +1,5 @@
 __author__ = 'mittr'
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from urllib.request import urlopen as ureq
 from PyQt5.QtWidgets import QTableWidgetItem
@@ -24,8 +23,7 @@ class Ui_MainWindow(object):
         # A little bit of Regex here to fetch the list items with id's beginning with flavor_name_
         containers = page_soup.findAll("li", {"id": re.compile("^flavor_name_")})
         total = len(containers)
-        # while True:
-        # try:
+
         # The solution set :)
         dictionary = {}
         i = 0
@@ -35,27 +33,33 @@ class Ui_MainWindow(object):
                 try:
                     if not container['data-dp-url']:
                         price = page_soup.find("span", {"id": "priceblock_ourprice"})
-                        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
-
-                    # now go to the link to fetch the price and store in the dictionary
+                        try:
+                            print(type(price.text))
+                            dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
+                        except AttributeError as e:
+                            print("Unavailable")
+                            # dictionary[str(container['title'][15:].strip())] = 'Unavailable'
+                        # now go to the link to fetch the price and store in the dictionary
                     else:
                         uCl = ureq('https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder' + container['data-dp-url'])
                         html = uCl.read()
                         uCl.close()
                         soup = Soup(html, "html.parser")
                         price = soup.find("span", {"id": "priceblock_ourprice"})
-                        dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
+                        try:
+                            print(type(price.text))
+                            # if type(price) != 'text':
+                            #     price = page_soup.find("span", {"id": "a-color-price"})
+                            dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
+                        except AttributeError as e:
+                            print("Unavailable")
+                            # dictionary[str(container['title'][15:].strip())] = 'Unavailable'
                     i += 1
                     completed = (i/total)*100
                     self.progressBar.setValue(completed)
                     break
                 except urllib2.HTTPError as err:
                     print("TRYING AGAIN - NETWORK ERROR")
-
-            """ except urllib2.HTTPError as err:
-                print("RESTARTING - NETWORK ERROR")
-            else:
-                break """
         print("Flavors in non-descending order of price: \n")
 
         # Sorting the dictionary items in non decreasing order!
@@ -78,11 +82,8 @@ class Ui_MainWindow(object):
         MainWindow.resize(600, 400)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 700))
-
         self.centralwidget = QtWidgets.QWidget(MainWindow)
-
         self.centralwidget.setObjectName("centralwidget")
-
         self.start = QtWidgets.QPushButton(self.centralwidget)
         self.start.setGeometry(QtCore.QRect(80, 130, 100, 30))
         self.start.setMaximumSize(QtCore.QSize(100, 30))
@@ -168,6 +169,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
-
