@@ -12,7 +12,6 @@ import urllib.request as urllib2
 
 class Ui_MainWindow(object):
 
-
     def whey(self):
         # Let's fetch the soup for the page here!
         my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000QSNYGI/ref=sr_1_6?s=hpc&ie=UTF8&qid=1516012071&sr=1-6&keywords=whey+protein'
@@ -25,13 +24,15 @@ class Ui_MainWindow(object):
         # A little bit of Regex here to fetch the list items with id's beginning with flavor_name_
         containers = page_soup.findAll("li", {"id": re.compile("^flavor_name_")})
         total = len(containers)
-        while True:
-            try:
-                # The solution set :)
-                dictionary = {}
-                i = 0
-                for container in containers:
-                    print(container['title'][15:], '\t', container['data-dp-url'])
+        # while True:
+        # try:
+        # The solution set :)
+        dictionary = {}
+        i = 0
+        for container in containers:
+            print(container['title'][15:], '\t', container['data-dp-url'])
+            while True:
+                try:
                     if not container['data-dp-url']:
                         price = page_soup.find("span", {"id": "priceblock_ourprice"})
                         dictionary[str(container['title'][15:].strip())] = float(price.text.replace(u'\xa0', u' ').replace(',', '').strip())
@@ -47,11 +48,14 @@ class Ui_MainWindow(object):
                     i += 1
                     completed = (i/total)*100
                     self.progressBar.setValue(completed)
-            except urllib2.HTTPError as err:
+                    break
+                except urllib2.HTTPError as err:
+                    print("TRYING AGAIN - NETWORK ERROR")
+
+            """ except urllib2.HTTPError as err:
                 print("RESTARTING - NETWORK ERROR")
-                pass
             else:
-                break
+                break """
         print("Flavors in non-descending order of price: \n")
 
         # Sorting the dictionary items in non decreasing order!
@@ -74,8 +78,11 @@ class Ui_MainWindow(object):
         MainWindow.resize(600, 400)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 700))
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
+
         self.centralwidget.setObjectName("centralwidget")
+
         self.start = QtWidgets.QPushButton(self.centralwidget)
         self.start.setGeometry(QtCore.QRect(80, 130, 100, 30))
         self.start.setMaximumSize(QtCore.QSize(100, 30))
@@ -132,6 +139,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.centralwidget.setWindowIcon(QtGui.QIcon('favicon.png'))
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         # Define custom handler
         self.handler()
@@ -160,4 +168,6 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
 
