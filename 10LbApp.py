@@ -13,7 +13,7 @@ class Ui_MainWindow(object):
 
     def whey(self):
         # Let's fetch the soup for the page here!
-        my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000QSNYGI/ref=sr_1_6?s=hpc&ie=UTF8&qid=1516012071&sr=1-6&keywords=whey+protein'
+        my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000GIQT2Y/ref=twister_B075ZYTP6Q?_encoding=UTF8&th=1'
 
         uClient = ureq(my_url)
         page_html = uClient.read()
@@ -147,13 +147,13 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("5LB Optimum Nutrition Minimum Price on Amazon India", "5LB Optimum Nutrition Minimum Price on Amazon India"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.start.setText(_translate("MainWindow", "Start"))
         self.size2.setText(_translate("MainWindow", "2 LB"))
         self.size5.setText(_translate("MainWindow", "5 LB"))
         self.size10.setText(_translate("MainWindow", "10 LB"))
-        self.groupBox1.setTitle(_translate("MainWindow", ""))
-        self.groupBox.setTitle(_translate("MainWindow", ""))
+        self.groupBox1.setTitle(_translate("MainWindow", "GroupBox"))
+        self.groupBox.setTitle(_translate("MainWindow", "GroupBox"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Flavor"))
         item = self.tableWidget.horizontalHeaderItem(1)
