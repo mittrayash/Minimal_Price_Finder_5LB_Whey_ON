@@ -13,7 +13,12 @@ class Ui_MainWindow(object):
 
     def whey(self):
         # Let's fetch the soup for the page here!
-        my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000QSNYGI/ref=sr_1_6?s=hpc&ie=UTF8&qid=1516012071&sr=1-6&keywords=whey+protein'
+
+        # Use this one for Whey Protein
+        # my_url = 'https://www.amazon.in/Optimum-Nutrition-Standard-Protein-Powder/dp/B000QSNYGI/ref=sr_1_6?s=hpc&ie=UTF8&qid=1516012071&sr=1-6&keywords=whey+protein'
+
+        # Use this for BCAA
+        my_url = 'https://www.amazon.in/BSN-Amino-Servings-Green-Apple/dp/B0055BYEE2/ref=sr_1_17?s=hpc&ie=UTF8&qid=1522424648&sr=1-17&keywords=bcaa&th=1'
 
         uClient = ureq(my_url)
         page_html = uClient.read()
